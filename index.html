@@ -8,9 +8,11 @@
 </head>
 <body>
 	
-	PARA PROBAR LOS PROCEDURE EN SQLDEVELOPER
+	<p>
+		PARA PROBAR LOS PROCEDURE EN SQLDEVELOPER
 https://stackoverflow.com/questions/6781916/how-to-test-an-oracle-stored-procedure-with-refcursor-return-type
----------------------------------------------------------------------------------------------------------------------------
+	</p>
+
 
 create or replace procedure SP_INICIO_SESION(p_CORREO IN VARCHAR2,p_CONTRASENA IN VARCHAR2, p_CURSOR OUT sys_refcursor)
 as
@@ -25,8 +27,8 @@ if(res>0) then
  end if;
  
 end SP_INICIO_SESION;
+<br>
 
-------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE PROCEDURE SP_INICIO_SESION_TRABAJADOR (p_NOMBRE_USUARIO IN VARCHAR2, p_CONTRASENA in VARCHAR2, p_CURSOR OUT sys_refcursor)
 AS 
@@ -61,7 +63,7 @@ BEGIN
 END SP_INICIO_SESION_TRABAJADOR;
 
 
----------------------------------------------------------------------------------------------------------------------------
+<br>
 
 create or replace procedure SP_REGISTRO_EMPRESA 
     (p_RUT_EMPRESA IN INTEGER,p_DV_EMPRESA IN CHAR,p_NOMBRE_EMPRESA IN VARCHAR2,p_IS_ACTIVO IN SMALLINT) as
@@ -70,7 +72,7 @@ insert into TBL_EMPRESA (TBL_EMPRESA.RUT_EMPRESA,TBL_EMPRESA.DV_EMPRESA,TBL_EMPR
 values(p_RUT_EMPRESA,p_DV_EMPRESA,p_NOMBRE_EMPRESA,p_IS_ACTIVO);
 end;
 
----------------------------------------------------------------------------------------------------------------------------
+<br>
 
 create or replace procedure SP_REGISTRO_LOCAL  (
 p_ID_EMPRESA IN INTEGER,
@@ -81,9 +83,7 @@ insert into TBL_LOCAL (TBL_LOCAL.ID_EMPRESA,TBL_LOCAL.NUMERO_LOCAL,TBL_LOCAL.DIR
 values(p_ID_EMPRESA,p_NUMERO_LOCAL,p_DIRECCION);
 end;
 
-
-
----------------------------------------------------------------------------------------------------------------------------
+<br>
 
 create or replace procedure SP_REGISTRO_PRODUCTO  (
 p_ID_ESTADO IN INTEGER,
@@ -112,7 +112,7 @@ p_PRECIO_OFERTA,
 p_FECHA_CADUCIDAD);
 end;
 
----------------------------------------------------------------------------------------------------------------------------
+<br>
 
 CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESAS_MENU(p_CURSOR OUT sys_refcursor) AS 
 BEGIN
@@ -136,7 +136,8 @@ BEGIN
 END SP_SELECT_EMPRESAS_MENU;
 
 
---------------------------------------------------------------------------------------------------------------------------
+<br>
+
 
 CREATE OR REPLACE PROCEDURE SP_SELECT_LOCAL_MENU(
 p_CURSOR OUT sys_refcursor
@@ -152,14 +153,17 @@ open p_CURSOR for
     inner join TBL_EMPRESA emp on emp.ID_EMPRESA = loc.ID_EMPRESA;
 END SP_SELECT_LOCAL_MENU;
 
----------------------------------------------------------------------------------------------------------------------------
+<br>
+
 create or replace procedure SP_REGISTRO_EMPRESA 
     (p_RUT_EMPRESA IN INTEGER,p_DV_EMPRESA IN CHAR,p_NOMBRE_EMPRESA IN VARCHAR2,p_IS_ACTIVO IN SMALLINT) as
 begin
 insert into TBL_EMPRESA (TBL_EMPRESA.RUT_EMPRESA,TBL_EMPRESA.DV_EMPRESA,TBL_EMPRESA.NOMBRE_EMPRESA,TBL_EMPRESA.IS_ACTIVO)
 values(p_RUT_EMPRESA,p_DV_EMPRESA,p_NOMBRE_EMPRESA,p_IS_ACTIVO);
 end;
----------------------------------------------------------------------------------------------------------------------------
+
+<br>
+
 create or replace procedure SP_REGISTRO_LOCAL  (
 p_ID_EMPRESA IN INTEGER,
 p_NUMERO_LOCAL IN INTEGER,
@@ -169,7 +173,8 @@ insert into TBL_LOCAL (TBL_LOCAL.ID_EMPRESA,TBL_LOCAL.NUMERO_LOCAL,TBL_LOCAL.DIR
 values(p_ID_EMPRESA,p_NUMERO_LOCAL,p_DIRECCION,1);
 end;
 
-------------------------------------------------------------------------------------------------------------------------
+<br>
+
 CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESA_POR_ID(p_ID_EMPRESA IN INTEGER, p_CURSOR OUT sys_refcursor) AS 
 BEGIN
   OPEN p_CURSOR FOR
@@ -186,7 +191,7 @@ BEGIN
         WHERE ID_EMPRESA = p_ID_EMPRESA;
 END SP_SELECT_EMPRESA_POR_ID;
 
-------------------------------------------------------------------------------------------------------------------------
+<br>
 
 CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESA_POR_RUT(p_RUT_EMPRESA IN INTEGER, p_CURSOR OUT sys_refcursor) AS 
 BEGIN
@@ -203,10 +208,9 @@ BEGIN
         FROM TBL_EMPRESA
         WHERE RUT_EMPRESA = p_RUT_EMPRESA;
 END SP_SELECT_EMPRESA_POR_RUT;
-
 
+<br>
 
----------------------------------------------------------------------------------------------------------------------------
 update TBL_LOCAL SET IS_ACTIVO = 1 WHERE ID_LOCAL >0
 
 
@@ -227,10 +231,8 @@ open p_CURSOR for
 
 END SP_SELECT_LOCALES_POR_IDEMPRES;
 
----------------------------------------------------------------------------------------------------------------------------
+<br>
 
-
-
 CREATE OR REPLACE PROCEDURE SP_SELECT_TRABAJADOR_MENU(p_CURSOR OUT SYS_REFCURSOR)
 AS 
 BEGIN
@@ -256,8 +258,7 @@ open p_CURSOR for
 END SP_SELECT_TRABAJADOR_MENU;
 
 
--------------------------------------------------------------------------------------------------------------------
-
+<br>
 
 
 </body>
