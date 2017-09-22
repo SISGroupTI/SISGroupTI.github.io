@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	
+	PARA PROBAR LOS PROCEDURE EN SQLDEVELOPER
+https://stackoverflow.com/questions/6781916/how-to-test-an-oracle-stored-procedure-with-refcursor-return-type
+---------------------------------------------------------------------------------------------------------------------------
+
+create or replace procedure SP_INICIO_SESION(p_CORREO IN VARCHAR2,p_CONTRASENA IN VARCHAR2, p_CURSOR OUT sys_refcursor)
+as
+res INTEGER;
+begin
+res:=FN_INICIO_SESION(p_CORREO,p_CONTRASENA);
+if(res>0) then
+ open p_CURSOR for
+ SELECT ID_CONSUMIDOR,RUT,DV,NOMBRE,APELLIDOS,CORREO,CONTRASENA,RECIBIR_OFERTA,IS_ACTIVO 
+    FROM TBL_CONSUMIDOR
+    where CORREO=p_CORREO and CONTRASENA=p_CONTRASENA;
+ end if;
+ 
+end SP_INICIO_SESION;
+
+------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE SP_INICIO_SESION_TRABAJADOR (p_NOMBRE_USUARIO IN VARCHAR2, p_CONTRASENA in VARCHAR2, p_CURSOR OUT sys_refcursor)
+AS 
+res integer;
+BEGIN
+ res:=FN_LOGIN_TRABAJADOR(p_NOMBRE_USUARIO,p_CONTRASENA);
+ if(res>0) then
+    OPEN p_CURSOR for
+    SELECT 
+        TB.ID_TRABAJADOR,
+        TB.NOMBRE_USUARIO,
+        TB.RUT,
+        TB.DV,
+        TB.NOMBRE,
+        TB.APELLIDOS,
+        TB.CORREO_CORPORATIVO,
+        TB.FECHA_INGRESO,
+        PE.NOMBRE_PERFIL,
+        PE.ID_PERFIL,
+        LOC.ID_LOCAL,
+        LOC.NUMERO_LOCAL,
+        EMP.ID_EMPRESA,
+        EMP.NOMBRE_EMPRESA
+        FROM TBL_TRABAJADOR TB
+        INNER JOIN TBL_PERFIL PE ON PE.ID_PERFIL = TB.ID_PERFIL
+        INNER JOIN TBL_LOCAL LOC ON LOC.ID_LOCAL = TB.ID_LOCAL
+        INNER JOIN TBL_EMPRESA EMP ON EMP.ID_EMPRESA = LOC.ID_EMPRESA
+        WHERE TB.NOMBRE_USUARIO = p_NOMBRE_USUARIO AND TB.CONTRASENA = p_CONTRASENA AND TB.IS_ACTIVO = 1;
+ end if;
+ 
+ 
+END SP_INICIO_SESION_TRABAJADOR;
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+create or replace procedure SP_REGISTRO_EMPRESA 
+    (p_RUT_EMPRESA IN INTEGER,p_DV_EMPRESA IN CHAR,p_NOMBRE_EMPRESA IN VARCHAR2,p_IS_ACTIVO IN SMALLINT) as
+begin
+insert into TBL_EMPRESA (TBL_EMPRESA.RUT_EMPRESA,TBL_EMPRESA.DV_EMPRESA,TBL_EMPRESA.NOMBRE_EMPRESA,TBL_EMPRESA.IS_ACTIVO)
+values(p_RUT_EMPRESA,p_DV_EMPRESA,p_NOMBRE_EMPRESA,p_IS_ACTIVO);
+end;
+
+---------------------------------------------------------------------------------------------------------------------------
+
+create or replace procedure SP_REGISTRO_LOCAL  (
+p_ID_EMPRESA IN INTEGER,
+p_NUMERO_LOCAL IN INTEGER,
+p_DIRECCION IN VARCHAR2) as
+begin
+insert into TBL_LOCAL (TBL_LOCAL.ID_EMPRESA,TBL_LOCAL.NUMERO_LOCAL,TBL_LOCAL.DIRECCION)
+values(p_ID_EMPRESA,p_NUMERO_LOCAL,p_DIRECCION);
+end;
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+create or replace procedure SP_REGISTRO_PRODUCTO  (
+p_ID_ESTADO IN INTEGER,
+p_ID_LOCAL IN INTEGER,
+p_CODIGO_PRODUCTO IN INTEGER,
+p_DESCRIPCION IN VARCHAR2,
+p_PRECIO_NORMAL IN INTEGER,
+p_PRECIO_OFERTA IN INTEGER,
+p_FECHA_CADUCIDAD IN DATE) as
+begin
+insert into TBL_PRODUCTO (
+TBL_PRODUCTO.ID_ESTADO,
+TBL_PRODUCTO.ID_LOCAL,
+TBL_PRODUCTO.CODIGO_PRODUCTO,
+TBL_PRODUCTO.DESCRIPCION,
+TBL_PRODUCTO.PRECIO_NORMAL,
+TBL_PRODUCTO.PRECIO_OFERTA,
+TBL_PRODUCTO.FECHA_CADUCIDAD)
+values(
+p_ID_ESTADO,
+p_ID_LOCAL,
+p_CODIGO_PRODUCTO,
+p_DESCRIPCION,
+p_PRECIO_NORMAL,
+p_PRECIO_OFERTA,
+p_FECHA_CADUCIDAD);
+end;
+
+---------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESAS_MENU(p_CURSOR OUT sys_refcursor) AS 
+BEGIN
+ open p_CURSOR for
+    select
+        emp.ID_EMPRESA,
+        concat(concat(emp.RUT_EMPRESA,'-'),emp.DV_EMPRESA) as RUT_EMPRESA,
+        emp.NOMBRE_EMPRESA,
+        to_char(emp.FECHA_INCORPORACION, 'DD/MM/YYYY') as FECHA_INCORPORACION,
+        count(loc.ID_LOCAL) as CANT_LOCAL
+        from TBL_EMPRESA emp
+        inner join TBL_LOCAL loc on emp.ID_EMPRESA = loc.ID_EMPRESA
+        where emp.IS_ACTIVO = 1
+        group by
+        emp.ID_EMPRESA,
+        concat(concat(emp.RUT_EMPRESA,'-'),emp.DV_EMPRESA),
+        emp.NOMBRE_EMPRESA,
+        to_char(emp.FECHA_INCORPORACION, 'DD/MM/YYYY');
+ 
+ 
+END SP_SELECT_EMPRESAS_MENU;
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE SP_SELECT_LOCAL_MENU(
+p_CURSOR OUT sys_refcursor
+) AS 
+BEGIN
+open p_CURSOR for
+  select 
+    loc.ID_LOCAL,
+    loc.NUMERO_LOCAL,
+    loc.DIRECCION,
+    emp.NOMBRE_EMPRESA
+    from TBL_LOCAL loc
+    inner join TBL_EMPRESA emp on emp.ID_EMPRESA = loc.ID_EMPRESA;
+END SP_SELECT_LOCAL_MENU;
+
+---------------------------------------------------------------------------------------------------------------------------
+create or replace procedure SP_REGISTRO_EMPRESA 
+    (p_RUT_EMPRESA IN INTEGER,p_DV_EMPRESA IN CHAR,p_NOMBRE_EMPRESA IN VARCHAR2,p_IS_ACTIVO IN SMALLINT) as
+begin
+insert into TBL_EMPRESA (TBL_EMPRESA.RUT_EMPRESA,TBL_EMPRESA.DV_EMPRESA,TBL_EMPRESA.NOMBRE_EMPRESA,TBL_EMPRESA.IS_ACTIVO)
+values(p_RUT_EMPRESA,p_DV_EMPRESA,p_NOMBRE_EMPRESA,p_IS_ACTIVO);
+end;
+---------------------------------------------------------------------------------------------------------------------------
+create or replace procedure SP_REGISTRO_LOCAL  (
+p_ID_EMPRESA IN INTEGER,
+p_NUMERO_LOCAL IN INTEGER,
+p_DIRECCION IN VARCHAR2) as
+begin
+insert into TBL_LOCAL (TBL_LOCAL.ID_EMPRESA,TBL_LOCAL.NUMERO_LOCAL,TBL_LOCAL.DIRECCION,IS_ACTIVO)
+values(p_ID_EMPRESA,p_NUMERO_LOCAL,p_DIRECCION,1);
+end;
+
+------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESA_POR_ID(p_ID_EMPRESA IN INTEGER, p_CURSOR OUT sys_refcursor) AS 
+BEGIN
+  OPEN p_CURSOR FOR
+  SELECT 
+        ID_EMPRESA,
+        RUT_EMPRESA,
+        DV_EMPRESA,
+        NOMBRE_EMPRESA,
+        FECHA_INCORPORACION,
+        FECHA_MODIFICACION,
+        FECHA_ELIMINACION,
+        IS_ACTIVO
+        FROM TBL_EMPRESA
+        WHERE ID_EMPRESA = p_ID_EMPRESA;
+END SP_SELECT_EMPRESA_POR_ID;
+
+------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PROCEDURE SP_SELECT_EMPRESA_POR_RUT(p_RUT_EMPRESA IN INTEGER, p_CURSOR OUT sys_refcursor) AS 
+BEGIN
+  OPEN p_CURSOR FOR
+  SELECT 
+        ID_EMPRESA,
+        RUT_EMPRESA,
+        DV_EMPRESA,
+        NOMBRE_EMPRESA,
+        FECHA_INCORPORACION,
+        FECHA_MODIFICACION,
+        FECHA_ELIMINACION,
+        IS_ACTIVO
+        FROM TBL_EMPRESA
+        WHERE RUT_EMPRESA = p_RUT_EMPRESA;
+END SP_SELECT_EMPRESA_POR_RUT;
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+update TBL_LOCAL SET IS_ACTIVO = 1 WHERE ID_LOCAL >0
+
+
+CREATE OR REPLACE PROCEDURE SP_SELECT_LOCALES_POR_IDEMPRES(p_ID_EMPRESA IN INTEGER,p_IS_ACTIVO IN INTEGER, p_CURSOR OUT sys_refcursor) AS 
+BEGIN
+open p_CURSOR for
+  select 
+        loc.ID_LOCAL,
+        loc.NUMERO_LOCAL,
+        loc.DIRECCION,
+        emp.NOMBRE_EMPRESA,
+        emp.ID_EMPRESA
+        from TBL_LOCAL loc
+        inner join TBL_EMPRESA emp on emp.ID_EMPRESA = loc.ID_EMPRESA
+        where emp.ID_EMPRESA = p_ID_EMPRESA
+        and loc.IS_ACTIVO = p_IS_ACTIVO
+        ;
+
+END SP_SELECT_LOCALES_POR_IDEMPRES;
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+
+CREATE OR REPLACE PROCEDURE SP_SELECT_TRABAJADOR_MENU(p_CURSOR OUT SYS_REFCURSOR)
+AS 
+BEGIN
+open p_CURSOR for
+    SELECT
+        TRA.ID_TRABAJADOR,
+        TRA.NOMBRE_USUARIO,
+        TRA.RUT,
+        TRA.DV,
+        TRA.NOMBRE,
+        TRA.APELLIDOS,
+        TRA.CORREO_CORPORATIVO,
+        TRA.FECHA_INGRESO,
+        TRA.IS_ACTIVO,
+        LOC.ID_LOCAL,
+        LOC.NUMERO_LOCAL,
+        LOC.DIRECCION,
+        PERF.ID_PERFIL,
+        PERF.NOMBRE_PERFIL
+        FROM TBL_TRABAJADOR TRA
+        INNER JOIN TBL_LOCAL LOC ON LOC.ID_LOCAL = TRA.ID_LOCAL
+        INNER JOIN TBL_PERFIL PERF ON PERF.ID_PERFIL = TRA.ID_PERFIL;
+END SP_SELECT_TRABAJADOR_MENU;
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+
+</body>
+</html>
